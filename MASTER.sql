@@ -1,4 +1,4 @@
------------------------------------------------------------------------------------------------------
+--CREATE TABLE assignment_history---------------------------------------------------------------------------------------------------
 
 DROP TABLE IF EXISTS assignment_history;
 CREATE TABLE assignment_history (
@@ -470,11 +470,11 @@ INSERT INTO assignment_history (
 (449, 20, 'Arlo King', 'Text', 'Organic', '2081-04-10 13:50:00'),
 (450, 11, 'Mira Cruz', 'Phone Call', 'Bought', '2081-04-10 15:00:00');
 
------------------------------------------------------------------------------------------------------
+--VIEW TABLE assignment_history---------------------------------------------------------------------------------------------------
 
 SELECT * FROM assignment_history
 
------------------------------------------------------------------------------------------------------
+--CREATE TABLE bookings---------------------------------------------------------------------------------------------------
 
 DROP TABLE IF EXISTS bookings;
 
@@ -918,11 +918,11 @@ INSERT INTO bookings (
 (411, 449, '2081-04-10 14:25:00', NULL, 'Titan', 'Ringside Cruise', 'New York Orbital Gateway', 140000, 20000, 160000, 'Confirmed'),
 (412, 450, '2081-04-10 14:25:00', NULL, 'Europa', 'Glacier Trek Adventure', 'Tokyo Spaceport Terminal', 120000, 25000, 145000, 'Confirmed');
 
------------------------------------------------------------------------------------------------------
+--VIEW TABLE bookings---------------------------------------------------------------------------------------------------
 
 SELECT * FROM bookings
 
------------------------------------------------------------------------------------------------------
+--CREATE TABLE space_travel_agents---------------------------------------------------------------------------------------------------
 
 DROP TABLE IF EXISTS space_travel_agents;
 CREATE TABLE space_travel_agents (
@@ -982,14 +982,14 @@ INSERT INTO space_travel_agents (
 (29, 'Sage', 'Cooper', 'sage.cooper@astra2081.com', 'Space Travel Agent', 'Luxury Voyages', 'Zane Holloway', 'SL-2081-029', 4, 4.3),
 (30, 'Zuri', 'Bennett', 'zuri.bennett@astra2081.com', 'Space Travel Agent', 'Interplanetary Sales', 'Lyra Chen', 'SL-2081-030', 2, 3.7);
 
------------------------------------------------------------------------------------------------------
+--VIEW TABLE space_travel_agents---------------------------------------------------------------------------------------------------
 
 SELECT * FROM space_travel_agents
 
------------------------------------------------------------------------------------------------------
+--SPACE TRAVEL AGENT RANKING ALGORITHM SCEN 1---------------------------------------------------------------------------------------------------
 
 -- =====================================================
--- SPACE TRAVEL AGENT RANKING ALGORITHM
+-- SPACE TRAVEL AGENT RANKING ALGORITHM SCEN 1
 -- =====================================================
 -- Purpose: Rank travel agents from best to worst match for a specific customer
 -- Based on: Historical performance, contextual experience, and customer service ratings
@@ -1098,7 +1098,7 @@ FROM (
 ) metrics
 ORDER BY final_score DESC;  -- Best match first
 
------------------------------------------------------------------------------------------------------
+--SPACE TRAVEL AGENT RANKING ALGORITHM SCEN 2---------------------------------------------------------------------------------------------------
 
 -- =====================================================
 -- SPACE TRAVEL AGENT RANKING ALGORITHM SCEN 2
@@ -1210,7 +1210,7 @@ FROM (
 ) metrics
 ORDER BY final_score DESC;  -- Best match first
 
------------------------------------------------------------------------------------------------------
+--SPACE TRAVEL AGENT RANKING ALGORITHM SCEN 3---------------------------------------------------------------------------------------------------
 
 -- =====================================================
 -- SPACE TRAVEL AGENT RANKING ALGORITHM SCEN 3
@@ -1322,9 +1322,7 @@ FROM (
 ) metrics
 ORDER BY final_score DESC;  -- Best match first
 
------------------------------------------------------------------------------------------------------
-
--- Check agent 10's performance
+---- Check agent X's performance---------------------------------------------------------------------------------------------------
 SELECT 
     ah.AgentID,
     ah.AssignmentID,
