@@ -69,25 +69,28 @@ Execute the query for your chosen scenario to get ranked results.
 # Test Scenarios
 
 ## Scenario 1: Phone Call / Organic / Mars / Dallas-Fort Worth
-sql
+```sql
 DECLARE @comm_method VARCHAR(20) = 'Phone Call';
 DECLARE @lead_source VARCHAR(20) = 'Organic';
 DECLARE @destination VARCHAR(50) = 'Mars';
 DECLARE @launch_location VARCHAR(100) = 'Dallas-Fort Worth Launch Complex';
+```
 
 ## Scenario 2: Phone Call / Bought / Titan / Dubai
-sql
+```sql
 DECLARE @comm_method VARCHAR(20) = 'Phone Call';
 DECLARE @lead_source VARCHAR(20) = 'Bought';
 DECLARE @destination VARCHAR(50) = 'Titan';
 DECLARE @launch_location VARCHAR(100) = 'Dubai Interplanetary Hub';
+```
 
 ## Scenario 3: Text / Bought / Europa / New York
-sql
+```sql
 DECLARE @comm_method VARCHAR(20) = 'Text';
 DECLARE @lead_source VARCHAR(20) = 'Bought';
 DECLARE @destination VARCHAR(50) = 'Europa';
 DECLARE @launch_location VARCHAR(100) = 'New York Orbital Gateway';
+```
 
 ## Notes
 Agents with no assignment history are excluded from results
