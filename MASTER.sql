@@ -1099,6 +1099,231 @@ FROM (
 ORDER BY final_score DESC;  -- Best match first
 
 -----------------------------------------------------------------------------------------------------
+
+-- =====================================================
+-- SPACE TRAVEL AGENT RANKING ALGORITHM SCEN 2
+-- =====================================================
+-- Purpose: Rank travel agents from best to worst match for a specific customer
+-- Based on: Historical performance, contextual experience, and customer service ratings
+-- =====================================================
+
+-- STEP 1: Define the incoming customer's preferences
+-- These variables represent the new customer we're trying to match with an agent
+DECLARE @comm_method VARCHAR(20) = 'Phone Call';      -- How the customer prefers to communicate
+DECLARE @lead_source VARCHAR(20) = 'Bought';         -- How the customer was acquired (Organic = found us, Bought = marketing campaign)
+DECLARE @destination VARCHAR(50) = 'Titan';            -- Where the customer wants to travel
+DECLARE @launch_location VARCHAR(100) = 'Dubai Interplanetary Hub';  -- Where they want to depart from
+
+-- STEP 2: Main query to calculate agent rankings
+-- This query builds a scoring system that balances:
+--   - 70%: How well the agent performs on SIMILAR customers (contextual success)
+--   - 20%: How well the agent performs overall (general success)  
+--   - 10%: Customer service rating (quality of experience)
+SELECT 
+    -- Final output columns
+    metrics.AgentID,
+    metrics.AgentName,                                    -- Agent's full name for easy identification
+    metrics.contextual_success_rate,                      -- Success rate on customers matching our criteria
+    metrics.overall_success_rate,                         -- Success rate across ALL customers
+    metrics.rating,                                       -- Customer service rating (1-5 scale)
+    metrics.final_score,                                  -- Weighted score (higher = better match)
+    RANK() OVER (ORDER BY metrics.final_score DESC) AS rank_position  -- Rank from best (1) to worst
+FROM (
+    -- STEP 3: Calculate each agent's scores
+    SELECT 
+        -- Basic agent information
+        ag.AgentID,
+        CONCAT(ag.FirstName, ' ', ag.LastName) AS AgentName,  -- Combine first and last name
+        ag.AverageCustomerServiceRating AS rating,
+        
+        -- OVERALL SUCCESS RATE: How often does this agent close ANY deal?
+        -- Formula: (Confirmed Bookings) / (Total Assignments)
+        ROUND(overall.successful_bookings * 1.0 / NULLIF(overall.total_assignments, 0), 3) AS overall_success_rate,
+        
+        -- CONTEXTUAL SUCCESS RATE: How often does this agent close deals that match our customer?
+        -- If they have experience with similar customers, use that rate
+        -- If not (NULL), fall back to their overall success rate
+        ROUND(
+            ISNULL(context.context_successes * 1.0 / NULLIF(context.context_assignments, 0), 
+                   overall.successful_bookings * 1.0 / NULLIF(overall.total_assignments, 0)), 
+            3
+        ) AS contextual_success_rate,
+        
+        -- FINAL SCORE: Weighted combination of contextual success, overall success, and rating
+        -- Formula: (Contextual Success × 0.7) + (Overall Success × 0.2) + (Rating ÷ 5 × 0.1)
+        -- Higher weight on contextual success because past performance on similar customers
+        -- is the best predictor of future success
+        ROUND(
+            ISNULL(context.context_successes * 1.0 / NULLIF(context.context_assignments, 0), 
+                   overall.successful_bookings * 1.0 / NULLIF(overall.total_assignments, 0)) * 0.7 +
+            (overall.successful_bookings * 1.0 / NULLIF(overall.total_assignments, 0)) * 0.2 +
+            (ag.AverageCustomerServiceRating / 5.0) * 0.1,
+        4) AS final_score
+        
+    FROM space_travel_agents ag
+    
+    -- STEP 4: Subquery 1 - Calculate OVERALL performance for every agent
+    -- This tells us: For ALL assignments (regardless of customer type), 
+    -- how many turned into confirmed bookings?
+    INNER JOIN (
+        SELECT 
+            ah.AgentID,
+            -- Total number of assignments this agent has ever handled
+            COUNT(DISTINCT ah.AssignmentID) AS total_assignments,
+            -- Number of assignments that resulted in a confirmed booking (not cancelled)
+            -- We count by AssignmentID to ensure each successful assignment is counted once
+            COUNT(DISTINCT CASE 
+                WHEN b.BookingStatus = 'Confirmed' AND b.CancelledDate IS NULL 
+                THEN ah.AssignmentID
+            END) AS successful_bookings
+        FROM assignment_history ah
+        LEFT JOIN bookings b ON ah.AssignmentID = b.AssignmentID  -- LEFT JOIN to include assignments without bookings
+        GROUP BY ah.AgentID
+    ) overall ON ag.AgentID = overall.AgentID
+    
+    -- STEP 5: Subquery 2 - Calculate CONTEXTUAL performance for this specific customer type
+    -- This tells us: For assignments that EXACTLY MATCH our customer's criteria,
+    -- how many turned into confirmed bookings?
+    LEFT JOIN (
+        SELECT 
+            ah.AgentID,
+            -- Total assignments matching the customer's communication method, lead source, destination, AND launch location
+            COUNT(DISTINCT ah.AssignmentID) AS context_assignments,
+            -- Successful assignments that match ALL criteria
+            COUNT(DISTINCT CASE 
+                WHEN b.BookingStatus = 'Confirmed' AND b.CancelledDate IS NULL 
+                THEN ah.AssignmentID
+            END) AS context_successes
+        FROM assignment_history ah
+        LEFT JOIN bookings b ON ah.AssignmentID = b.AssignmentID
+        WHERE ah.CommunicationMethod = @comm_method           -- Match communication preference
+          AND ah.LeadSource = @lead_source                    -- Match how they found us
+          AND b.Destination = @destination                    -- Match destination
+          AND b.LaunchLocation = @launch_location             -- Match launch location
+        GROUP BY ah.AgentID
+    ) context ON ag.AgentID = context.AgentID
+    
+    -- STEP 6: Filter out agents with no assignment history
+    -- We can't evaluate agents who have never handled any customers
+    WHERE overall.total_assignments > 0
+    
+) metrics
+ORDER BY final_score DESC;  -- Best match first
+
+-----------------------------------------------------------------------------------------------------
+
+-- =====================================================
+-- SPACE TRAVEL AGENT RANKING ALGORITHM SCEN 3
+-- =====================================================
+-- Purpose: Rank travel agents from best to worst match for a specific customer
+-- Based on: Historical performance, contextual experience, and customer service ratings
+-- =====================================================
+
+-- STEP 1: Define the incoming customer's preferences
+-- These variables represent the new customer we're trying to match with an agent
+DECLARE @comm_method VARCHAR(20) = 'Text';      -- How the customer prefers to communicate
+DECLARE @lead_source VARCHAR(20) = 'Bought';         -- How the customer was acquired (Organic = found us, Bought = marketing campaign)
+DECLARE @destination VARCHAR(50) = 'Europa';            -- Where the customer wants to travel
+DECLARE @launch_location VARCHAR(100) = 'New York Orbital Gateway';  -- Where they want to depart from
+
+-- STEP 2: Main query to calculate agent rankings
+-- This query builds a scoring system that balances:
+--   - 70%: How well the agent performs on SIMILAR customers (contextual success)
+--   - 20%: How well the agent performs overall (general success)  
+--   - 10%: Customer service rating (quality of experience)
+SELECT 
+    -- Final output columns
+    metrics.AgentID,
+    metrics.AgentName,                                    -- Agent's full name for easy identification
+    metrics.contextual_success_rate,                      -- Success rate on customers matching our criteria
+    metrics.overall_success_rate,                         -- Success rate across ALL customers
+    metrics.rating,                                       -- Customer service rating (1-5 scale)
+    metrics.final_score,                                  -- Weighted score (higher = better match)
+    RANK() OVER (ORDER BY metrics.final_score DESC) AS rank_position  -- Rank from best (1) to worst
+FROM (
+    -- STEP 3: Calculate each agent's scores
+    SELECT 
+        -- Basic agent information
+        ag.AgentID,
+        CONCAT(ag.FirstName, ' ', ag.LastName) AS AgentName,  -- Combine first and last name
+        ag.AverageCustomerServiceRating AS rating,
+        
+        -- OVERALL SUCCESS RATE: How often does this agent close ANY deal?
+        -- Formula: (Confirmed Bookings) / (Total Assignments)
+        ROUND(overall.successful_bookings * 1.0 / NULLIF(overall.total_assignments, 0), 3) AS overall_success_rate,
+        
+        -- CONTEXTUAL SUCCESS RATE: How often does this agent close deals that match our customer?
+        -- If they have experience with similar customers, use that rate
+        -- If not (NULL), fall back to their overall success rate
+        ROUND(
+            ISNULL(context.context_successes * 1.0 / NULLIF(context.context_assignments, 0), 
+                   overall.successful_bookings * 1.0 / NULLIF(overall.total_assignments, 0)), 
+            3
+        ) AS contextual_success_rate,
+        
+        -- FINAL SCORE: Weighted combination of contextual success, overall success, and rating
+        -- Formula: (Contextual Success × 0.7) + (Overall Success × 0.2) + (Rating ÷ 5 × 0.1)
+        -- Higher weight on contextual success because past performance on similar customers
+        -- is the best predictor of future success
+        ROUND(
+            ISNULL(context.context_successes * 1.0 / NULLIF(context.context_assignments, 0), 
+                   overall.successful_bookings * 1.0 / NULLIF(overall.total_assignments, 0)) * 0.7 +
+            (overall.successful_bookings * 1.0 / NULLIF(overall.total_assignments, 0)) * 0.2 +
+            (ag.AverageCustomerServiceRating / 5.0) * 0.1,
+        4) AS final_score
+        
+    FROM space_travel_agents ag
+    
+    -- STEP 4: Subquery 1 - Calculate OVERALL performance for every agent
+    -- This tells us: For ALL assignments (regardless of customer type), 
+    -- how many turned into confirmed bookings?
+    INNER JOIN (
+        SELECT 
+            ah.AgentID,
+            -- Total number of assignments this agent has ever handled
+            COUNT(DISTINCT ah.AssignmentID) AS total_assignments,
+            -- Number of assignments that resulted in a confirmed booking (not cancelled)
+            -- We count by AssignmentID to ensure each successful assignment is counted once
+            COUNT(DISTINCT CASE 
+                WHEN b.BookingStatus = 'Confirmed' AND b.CancelledDate IS NULL 
+                THEN ah.AssignmentID
+            END) AS successful_bookings
+        FROM assignment_history ah
+        LEFT JOIN bookings b ON ah.AssignmentID = b.AssignmentID  -- LEFT JOIN to include assignments without bookings
+        GROUP BY ah.AgentID
+    ) overall ON ag.AgentID = overall.AgentID
+    
+    -- STEP 5: Subquery 2 - Calculate CONTEXTUAL performance for this specific customer type
+    -- This tells us: For assignments that EXACTLY MATCH our customer's criteria,
+    -- how many turned into confirmed bookings?
+    LEFT JOIN (
+        SELECT 
+            ah.AgentID,
+            -- Total assignments matching the customer's communication method, lead source, destination, AND launch location
+            COUNT(DISTINCT ah.AssignmentID) AS context_assignments,
+            -- Successful assignments that match ALL criteria
+            COUNT(DISTINCT CASE 
+                WHEN b.BookingStatus = 'Confirmed' AND b.CancelledDate IS NULL 
+                THEN ah.AssignmentID
+            END) AS context_successes
+        FROM assignment_history ah
+        LEFT JOIN bookings b ON ah.AssignmentID = b.AssignmentID
+        WHERE ah.CommunicationMethod = @comm_method           -- Match communication preference
+          AND ah.LeadSource = @lead_source                    -- Match how they found us
+          AND b.Destination = @destination                    -- Match destination
+          AND b.LaunchLocation = @launch_location             -- Match launch location
+        GROUP BY ah.AgentID
+    ) context ON ag.AgentID = context.AgentID
+    
+    -- STEP 6: Filter out agents with no assignment history
+    -- We can't evaluate agents who have never handled any customers
+    WHERE overall.total_assignments > 0
+    
+) metrics
+ORDER BY final_score DESC;  -- Best match first
+
+-----------------------------------------------------------------------------------------------------
+
 -- Check agent 10's performance
 SELECT 
     ah.AgentID,
