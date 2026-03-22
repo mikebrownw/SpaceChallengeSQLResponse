@@ -76,7 +76,7 @@ DECLARE @destination VARCHAR(50) = 'Mars';
 DECLARE @launch_location VARCHAR(100) = 'Dallas-Fort Worth Launch Complex';
 Expected Result: Agents with proven experience on this exact combination rank highest.
 
-**### Scenario 2: Phone Call / Bought / Titan / Dubai**
+### Scenario 2: Phone Call / Bought / Titan / Dubai
 ```sql
 DECLARE @comm_method VARCHAR(20) = 'Phone Call';
 DECLARE @lead_source VARCHAR(20) = 'Bought';
@@ -84,14 +84,14 @@ DECLARE @destination VARCHAR(50) = 'Titan';
 DECLARE @launch_location VARCHAR(100) = 'Dubai Interplanetary Hub';
 Expected Result: Tests the algorithm's ability to handle different lead sources and destinations.
 
-**### Scenario 3: Text / Bought / Europa / New York**
+### Scenario 3: Text / Bought / Europa / New York
 ```sql
 DECLARE @comm_method VARCHAR(20) = 'Text';
 DECLARE @lead_source VARCHAR(20) = 'Bought';
 DECLARE @destination VARCHAR(50) = 'Europa';
 DECLARE @launch_location VARCHAR(100) = 'New York Orbital Gateway';
 
-**## Notes**
+## Notes
 Agents with no assignment history are excluded from results
 "Confirmed" bookings with no cancellation date count as successes
 The warning "Null value eliminated" during execution is normal and indicates agents with no contextual matches
