@@ -66,30 +66,30 @@ Execute the query for your chosen scenario to get ranked results.
 | `final_score` | Weighted composite score (higher = better match) |
 | `rank_position` | 1 = best match, 30 = worst match |
 
-## Test Scenarios
+# Test Scenarios
 
-Scenario 1: Phone Call / Organic / Mars / Dallas-Fort Worth
+**##** Scenario 1: Phone Call / Organic / Mars / Dallas-Fort Worth
 ```sql
 DECLARE @comm_method VARCHAR(20) = 'Phone Call';
 DECLARE @lead_source VARCHAR(20) = 'Organic';
 DECLARE @destination VARCHAR(50) = 'Mars';
 DECLARE @launch_location VARCHAR(100) = 'Dallas-Fort Worth Launch Complex';
 
-Scenario 2: Phone Call / Bought / Titan / Dubai
+**##** Scenario 2: Phone Call / Bought / Titan / Dubai
 ```sql
 DECLARE @comm_method VARCHAR(20) = 'Phone Call';
 DECLARE @lead_source VARCHAR(20) = 'Bought';
 DECLARE @destination VARCHAR(50) = 'Titan';
 DECLARE @launch_location VARCHAR(100) = 'Dubai Interplanetary Hub';
 
-Scenario 3: Text / Bought / Europa / New York
+**##** Scenario 3: Text / Bought / Europa / New York
 ```sql
 DECLARE @comm_method VARCHAR(20) = 'Text';
 DECLARE @lead_source VARCHAR(20) = 'Bought';
 DECLARE @destination VARCHAR(50) = 'Europa';
 DECLARE @launch_location VARCHAR(100) = 'New York Orbital Gateway';
 
-## Notes
+**##** Notes
 Agents with no assignment history are excluded from results
 "Confirmed" bookings with no cancellation date count as successes
 The warning "Null value eliminated" during execution is normal and indicates agents with no contextual matches
