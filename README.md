@@ -77,7 +77,7 @@ DECLARE @launch_location VARCHAR(100) = 'Dallas-Fort Worth Launch Complex';
 Expected Result: Agents with proven experience on this exact combination rank highest.
 
 ### Scenario 2: Phone Call / Bought / Titan / Dubai
-sql
+```sql
 DECLARE @comm_method VARCHAR(20) = 'Phone Call';
 DECLARE @lead_source VARCHAR(20) = 'Bought';
 DECLARE @destination VARCHAR(50) = 'Titan';
@@ -85,7 +85,7 @@ DECLARE @launch_location VARCHAR(100) = 'Dubai Interplanetary Hub';
 Expected Result: Tests the algorithm's ability to handle different lead sources and destinations.
 
 ### Scenario 3: Text / Bought / Europa / New York
-sql
+```sql
 DECLARE @comm_method VARCHAR(20) = 'Text';
 DECLARE @lead_source VARCHAR(20) = 'Bought';
 DECLARE @destination VARCHAR(50) = 'Europa';
