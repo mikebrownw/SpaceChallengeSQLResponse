@@ -93,7 +93,7 @@ DECLARE @launch_location VARCHAR(100) = 'New York Orbital Gateway';
 ```
 
 ## Notes
-Agents with no assignment history are excluded from results
-"Confirmed" bookings with no cancellation date count as successes
-The warning "Null value eliminated" during execution is normal and indicates agents with no contextual matches
-Tested on SQL Server 2017 via DB Fiddle
+-Agents with no assignment history are excluded from results
+-"Confirmed" bookings with no cancellation date count as successes
+-The warning "Null value eliminated" during execution is normal and indicates agents with no contextual matches
+-Tested on SQL Server 2017 via DB Fiddle
